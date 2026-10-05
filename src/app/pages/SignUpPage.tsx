@@ -79,10 +79,10 @@ export function SignUpPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="font-['Inter',sans-serif] font-bold text-[32px] text-[#030213] leading-tight mb-2">
-              Create Account
+              Join AAUB CampusX
             </h1>
-            <p className="font-['Inter',sans-serif] text-[#717182] text-[16px]">
-              Join the student portal community
+            <p className="font-['Inter',sans-serif] text-[#717182] text-[15px] leading-relaxed">
+              Create your institutional account to synchronize your courses, hall mess, and campus services.
             </p>
           </div>
 
@@ -268,11 +268,11 @@ export function SignUpPage() {
 
         {/* Text Content */}
         <div className="relative z-10 text-center max-w-md animate-in fade-in slide-in-from-top-6 duration-1000">
-          <h2 className="font-['Playfair_Display',serif] font-bold text-white text-[52px] leading-tight mb-4 drop-shadow-2xl">
-            Join the Student Portal
+          <h2 className="font-['Inter',sans-serif] font-bold text-white text-[42px] leading-tight mb-3 drop-shadow-2xl">
+            Join CampusX
           </h2>
-          <p className="font-['Inter',sans-serif] text-blue-50 text-[18px] font-medium drop-shadow-md">
-            Get access to courses, grades, and university resources
+          <p className="font-['Inter',sans-serif] text-blue-50 text-[16px] font-medium leading-relaxed drop-shadow-md">
+            Connect to AAUB's unified intelligence network with live academics, learning vault, and career pipelines.
           </p>
         </div>
       </div>

@@ -1,13 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useUser, useClerk } from "@clerk/clerk-react";
-import { Navbar } from "../components/Navbar";
-import { HeroSection } from "../components/HeroSection";
-import { FacultiesSection } from "../components/FacultiesSection";
-import { CollaboratorsSection } from "../components/CollaboratorsSection";
+
+import { CampusXNavbar } from "../components/campusx/CampusXNavbar";
+import { CampusXHero } from "../components/campusx/CampusXHero";
+import { CampusXModulesSection } from "../components/campusx/CampusXModulesSection";
+import { CampusXProblemSection } from "../components/campusx/CampusXProblemSection";
 import { AboutSection } from "../components/AboutSection";
-import { EducationSection } from "../components/EducationSection";
-import { Footer } from "../components/Footer";
+import { CampusXFooter } from "../components/campusx/CampusXFooter";
 
 export function LandingPage() {
   const [activeSection, setActiveSection] = useState("home");
@@ -15,14 +15,15 @@ export function LandingPage() {
   const { isSignedIn } = useUser();
   const { signOut } = useClerk();
 
+  // Scrollspy to detect active section
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ["home", "about", "help"];
+      const sections = ["home", "modules", "problem", "roles", "about"];
       for (let i = sections.length - 1; i >= 0; i--) {
         const el = document.getElementById(sections[i]);
         if (el) {
           const rect = el.getBoundingClientRect();
-          if (rect.top <= 150) {
+          if (rect.top <= 200) {
             setActiveSection(sections[i]);
             return;
           }
@@ -45,68 +46,72 @@ export function LandingPage() {
         navigate("/signup");
         return;
       }
+      if (section === "dashboard") {
+        navigate("/dashboard");
+        return;
+      }
+      if (section === "home") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setActiveSection("home");
+        return;
+      }
+      if (section === "ecosystem" || section === "faculties" || section === "features") {
+        section = "modules";
+      }
+      if (section === "students" || section === "faculty") {
+        section = "roles";
+      }
       setActiveSection(section);
       const el = document.getElementById(section);
       if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     },
     [navigate]
   );
 
-  const handleJoinNow = useCallback(() => {
+  const handleGetStarted = useCallback(() => {
     navigate("/signup");
-  }, [navigate]);
-
-  const handleLoginDashboard = useCallback(() => {
-    navigate("/login");
   }, [navigate]);
 
   const handleGoToDashboard = useCallback(() => {
     navigate("/dashboard");
   }, [navigate]);
 
-  const handleSignOut = useCallback(async () => {
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userProfile");
-    await signOut();
-    navigate("/");
-  }, [signOut, navigate]);
-
-  const handleViewDetails = useCallback(() => {
-    const el = document.getElementById("help");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+  const handleFeatureSelect = useCallback((featureId: string) => {
+    const el = document.getElementById("modules");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
   }, []);
 
   return (
-    <div className="bg-[#fefefe] min-h-screen w-full overflow-x-hidden">
-      <Navbar activeSection={activeSection} onNavigate={handleNavigate} />
-
-      <HeroSection
-        isSignedIn={!!isSignedIn}
-        onJoinNow={handleJoinNow}
-        onLoginDashboard={handleLoginDashboard}
-        onGoToDashboard={handleGoToDashboard}
-        onSignOut={handleSignOut}
+    <div className="bg-[#F4F8FC] min-h-screen w-full overflow-x-hidden font-['Inter',sans-serif] text-[#101828] selection:bg-[#1677FF]/20 selection:text-[#0B1633]">
+      {/* 1. Floating Pill Top Navbar matching Image 2 */}
+      <CampusXNavbar
+        activeSection={activeSection}
+        onNavigate={handleNavigate}
       />
 
-      <div className="py-4 sm:py-6">
-        <FacultiesSection />
-      </div>
+      {/* 2. Hero Section matching Image 2 exactly with Panoramic Campus & Feature Dock */}
+      <CampusXHero
+        isSignedIn={!!isSignedIn}
+        onGetStarted={handleGetStarted}
+        onGoToDashboard={handleGoToDashboard}
+        onSelectFeature={handleFeatureSelect}
+      />
 
-      <div className="py-4 sm:py-6">
-        <CollaboratorsSection />
-      </div>
+      {/* 3. Core University Intelligence Modules (M1-M8 & R&D) */}
+      <CampusXModulesSection />
 
-      <AboutSection onViewDetails={handleViewDetails} />
+      {/* 4. Problem Solved & Institutional Network */}
+      <CampusXProblemSection />
 
-      <div className="px-2.5 sm:px-4 py-4 sm:py-6">
-        <EducationSection />
-      </div>
+      {/* 5. User Roles & Institutional Mission */}
+      <AboutSection
+        onViewDetails={() => window.open("https://aaub.edu.bd/content/about-us", "_blank")}
+      />
 
-      <Footer />
+      {/* Clean Institutional Footer */}
+      <CampusXFooter />
     </div>
   );
 }

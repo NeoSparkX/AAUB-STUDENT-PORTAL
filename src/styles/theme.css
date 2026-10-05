@@ -179,3 +179,109 @@
     line-height: 1.5;
   }
 }
+
+/* ==========================================================================
+   AAUB CampusX Design System Tokens & Utilities
+   Reference: AAUB_CampusX_Design_System.md
+   ========================================================================== */
+
+:root {
+  --color-campus-bg: #F4F8FC;
+  --color-campus-surface: #FFFFFF;
+  --color-campus-navy: #0B1633;
+  --color-campus-blue: #1677FF;
+  --color-campus-blue-soft: #DCEEFF;
+
+  --color-campus-text: #101828;
+  --color-campus-text-secondary: #475467;
+  --color-campus-text-muted: #667085;
+
+  --color-campus-border: #D9E2EC;
+
+  --color-campus-success: #16A66A;
+  --color-campus-warning: #F59E0B;
+  --color-campus-danger: #E5484D;
+  --color-campus-event: #E94B8A;
+  --color-campus-research: #665CFF;
+}
+
+/* Soft Neomorphism (Section 12) */
+.neo-soft {
+  box-shadow: 8px 8px 20px rgba(31, 45, 61, 0.08), -6px -6px 16px rgba(255, 255, 255, 0.85);
+}
+.neo-soft-sm {
+  box-shadow: 4px 4px 12px rgba(31, 45, 61, 0.06), -3px -3px 10px rgba(255, 255, 255, 0.8);
+}
+.neo-inset {
+  box-shadow: inset 2px 2px 5px rgba(31, 45, 61, 0.06), inset -2px -2px 5px rgba(255, 255, 255, 0.9);
+}
+
+/* Restrained Glassmorphism (Section 13 & 14) */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 12px 40px rgba(24, 39, 75, 0.08);
+}
+.glass-panel-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 30px rgba(16, 24, 40, 0.07);
+}
+.glass-panel-subtle {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 24px rgba(24, 39, 75, 0.06);
+}
+.glass-panel-dark {
+  background: rgba(11, 22, 51, 0.78);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+}
+
+/* =========================================================================
+   Smooth Scrolling & Custom Sleek Redesigned Scrollbar
+   ========================================================================= */
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(22, 119, 255, 0.35) rgba(15, 23, 42, 0.03);
+}
+
+/* Chrome, Edge, Safari WebKit Scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(244, 248, 252, 0.7);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.2);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: all 0.25s ease-in-out;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(22, 119, 255, 0.65);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #1677FF;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+

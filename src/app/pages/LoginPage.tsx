@@ -178,14 +178,14 @@ export function LoginPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="font-['Inter',sans-serif] font-bold text-[32px] text-[#030213] leading-tight mb-2">
-              {forgotPassword ? "Reset Password" : "Welcome Back"}
+              {forgotPassword ? "Reset Password" : "Sign in to CampusX"}
             </h1>
-            <p className="font-['Inter',sans-serif] text-[#717182] text-[16px]">
+            <p className="font-['Inter',sans-serif] text-[#717182] text-[15px] leading-relaxed">
               {forgotPassword
                 ? resetCodeSent
                   ? "Enter the code sent to your email and your new password"
-                  : "Enter your email to receive a reset code"
-                : "Log in to your student portal account"}
+                  : "Enter your institutional email to receive a reset code"
+                : "Access your live academic core, campus transport, and university services"}
             </p>
           </div>
 
@@ -479,11 +479,11 @@ export function LoginPage() {
 
         {/* Text Content */}
         <div className="relative z-10 text-center max-w-md animate-in fade-in slide-in-from-top-6 duration-1000">
-          <h2 className="font-['Playfair_Display',serif] font-bold text-white text-[52px] leading-tight mb-4 drop-shadow-2xl">
-            Welcome back to Student Portal
+          <h2 className="font-['Inter',sans-serif] font-bold text-white text-[42px] leading-tight mb-3 drop-shadow-2xl">
+            AAUB CampusX
           </h2>
-          <p className="font-['Inter',sans-serif] text-blue-50 text-[18px] font-medium drop-shadow-md">
-            Access your courses, grades, and university resources
+          <p className="font-['Inter',sans-serif] text-blue-50 text-[16px] font-medium leading-relaxed drop-shadow-md">
+            Unified University Intelligence. One platform connecting academics, logistics, and student life.
           </p>
         </div>
 
