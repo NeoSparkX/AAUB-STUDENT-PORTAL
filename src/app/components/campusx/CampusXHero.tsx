@@ -121,7 +121,7 @@ export function CampusXHero({
             >
               <button
                 onClick={isSignedIn ? onGoToDashboard : onGetStarted}
-                className="bg-[#0F172A] hover:bg-[#020617] text-white font-['Inter',sans-serif] font-semibold text-[14px] sm:text-[14.5px] px-6 sm:px-7 py-3 rounded-full shadow-[0_6px_20px_rgba(15,23,42,0.2)] hover:shadow-[0_10px_28px_rgba(15,23,42,0.3)] transition-all duration-200 cursor-pointer flex items-center gap-2 group"
+                className="bg-[#0F172A] hover:bg-[#020617] text-[#101828] font-['Inter',sans-serif] font-semibold text-[14px] sm:text-[14.5px] px-6 sm:px-7 py-3 rounded-full shadow-[0_6px_20px_rgba(15,23,42,0.2)] hover:shadow-[0_10px_28px_rgba(15,23,42,0.3)] transition-all duration-200 cursor-pointer flex items-center gap-2 group"
               >
                 <span>{isSignedIn ? "Go to Dashboard" : "Get Started"}</span>
                 <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

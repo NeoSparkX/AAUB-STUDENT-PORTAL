@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useUser, useClerk } from "@clerk/clerk-react";
+import { useAuth } from "../../context/AuthContext";
 
 import { CampusXNavbar } from "../components/campusx/CampusXNavbar";
 import { CampusXHero } from "../components/campusx/CampusXHero";
@@ -12,8 +12,8 @@ import { CampusXFooter } from "../components/campusx/CampusXFooter";
 export function LandingPage() {
   const [activeSection, setActiveSection] = useState("home");
   const navigate = useNavigate();
-  const { isSignedIn } = useUser();
-  const { signOut } = useClerk();
+  const { user } = useAuth();
+  const isSignedIn = !!user;
 
   // Scrollspy to detect active section
   useEffect(() => {
@@ -93,7 +93,7 @@ export function LandingPage() {
 
       {/* 2. Hero Section matching Image 2 exactly with Panoramic Campus & Feature Dock */}
       <CampusXHero
-        isSignedIn={!!isSignedIn}
+        isSignedIn={isSignedIn}
         onGetStarted={handleGetStarted}
         onGoToDashboard={handleGoToDashboard}
         onSelectFeature={handleFeatureSelect}

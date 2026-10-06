@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
-import { ArrowUpRight, Menu, X, LayoutDashboard } from "lucide-react";
+import { ArrowUpRight, Menu, X, LayoutDashboard, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CampusXLogo } from "./CampusXLogo";
+import { useAuth } from "../../../context/AuthContext";
+import { supabase } from "../../../lib/supabase";
 
 interface CampusXNavbarProps {
   activeSection: string;
@@ -12,6 +13,7 @@ interface CampusXNavbarProps {
 export function CampusXNavbar({ activeSection, onNavigate }: CampusXNavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     let ticking = false;
@@ -47,6 +49,10 @@ export function CampusXNavbar({ activeSection, onNavigate }: CampusXNavbarProps)
   const handleNavClick = (id: string) => {
     onNavigate(id);
     setMobileMenuOpen(false);
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
   };
 
   return (
@@ -89,7 +95,7 @@ export function CampusXNavbar({ activeSection, onNavigate }: CampusXNavbarProps)
                 className={`cursor-pointer rounded-full text-[13.5px] transition-all duration-200 whitespace-nowrap relative ${
                   isActive
                     ? "text-[#0B1633] font-bold px-4 py-1.5"
-                    : "text-[#475467] font-medium hover:text-[#0B1633] px-3.5 py-1.5 hover:bg-white/50"
+                    : "text-[#475467] font-medium hover:text-[#0B1633] px-3.5 py-1.5 hover:bg-gray-500"
                 }`}
               >
                 {isActive && (
@@ -118,7 +124,7 @@ export function CampusXNavbar({ activeSection, onNavigate }: CampusXNavbarProps)
                 <div className="flex items-center pl-1 shrink-0">
                   <div className="h-4 w-px bg-black/10 mr-1.5 shrink-0" />
 
-                  <SignedOut>
+                  {!user ? (
                     <button
                       onClick={() => onNavigate("login")}
                       className="bg-[#111827] hover:bg-[#0B1633] text-white font-['Inter',sans-serif] font-medium text-[12.5px] px-3.5 py-1.5 rounded-full cursor-pointer transition-all duration-200 shadow-xs flex items-center gap-1.5 whitespace-nowrap group"
@@ -126,9 +132,7 @@ export function CampusXNavbar({ activeSection, onNavigate }: CampusXNavbarProps)
                       <span>Sign In</span>
                       <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </button>
-                  </SignedOut>
-
-                  <SignedIn>
+                  ) : (
                     <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => onNavigate("dashboard")}
@@ -137,15 +141,15 @@ export function CampusXNavbar({ activeSection, onNavigate }: CampusXNavbarProps)
                         <LayoutDashboard className="w-3 h-3" />
                         <span>Dashboard</span>
                       </button>
-                      <UserButton
-                        appearance={{
-                          elements: {
-                            avatarBox: "w-7 h-7 rounded-full border border-black/10 shadow-xs",
-                          },
-                        }}
-                      />
+                      <button
+                        onClick={handleSignOut}
+                        className="bg-red-500 hover:bg-red-600 text-white font-['Inter',sans-serif] font-medium text-[12px] px-3 py-1 rounded-full cursor-pointer transition-all shadow-xs flex items-center gap-1 whitespace-nowrap"
+                      >
+                        <LogOut className="w-3 h-3" />
+                        <span>Sign Out</span>
+                      </button>
                     </div>
-                  </SignedIn>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -167,7 +171,7 @@ export function CampusXNavbar({ activeSection, onNavigate }: CampusXNavbarProps)
                 transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                 className="flex items-center"
               >
-                <SignedOut>
+                {!user ? (
                   <button
                     onClick={() => onNavigate("login")}
                     className="bg-[#111827] hover:bg-[#0B1633] text-white font-['Inter',sans-serif] font-medium text-[13.5px] px-5 py-2.5 rounded-full cursor-pointer transition-all duration-200 shadow-[0_4px_16px_rgba(17,24,39,0.15)] flex items-center gap-2 group whitespace-nowrap"
@@ -175,9 +179,7 @@ export function CampusXNavbar({ activeSection, onNavigate }: CampusXNavbarProps)
                     <span>Sign In</span>
                     <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </button>
-                </SignedOut>
-
-                <SignedIn>
+                ) : (
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => onNavigate("dashboard")}
@@ -186,15 +188,15 @@ export function CampusXNavbar({ activeSection, onNavigate }: CampusXNavbarProps)
                       <LayoutDashboard className="w-3.5 h-3.5" />
                       <span>Dashboard</span>
                     </button>
-                    <UserButton
-                      appearance={{
-                        elements: {
-                          avatarBox: "w-8 h-8 rounded-full border border-black/10 shadow-xs",
-                        },
-                      }}
-                    />
+                    <button
+                      onClick={handleSignOut}
+                      className="bg-red-500 hover:bg-red-600 text-white font-['Inter',sans-serif] font-medium text-[13px] px-4 py-2 rounded-full cursor-pointer transition-all shadow-xs flex items-center gap-1.5 whitespace-nowrap"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Sign Out</span>
+                    </button>
                   </div>
-                </SignedIn>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -229,7 +231,7 @@ export function CampusXNavbar({ activeSection, onNavigate }: CampusXNavbarProps)
             </button>
           ))}
           <div className="pt-2 border-t border-black/5 mt-1 flex flex-col gap-2">
-            <SignedOut>
+            {!user ? (
               <button
                 onClick={() => handleNavClick("login")}
                 className="w-full bg-[#111827] text-white py-2.5 rounded-2xl font-medium text-[14px] flex items-center justify-center gap-1.5"
@@ -237,19 +239,31 @@ export function CampusXNavbar({ activeSection, onNavigate }: CampusXNavbarProps)
                 <span>Sign In</span>
                 <ArrowUpRight className="w-4 h-4" />
               </button>
-            </SignedOut>
-            <SignedIn>
-              <button
-                onClick={() => handleNavClick("dashboard")}
-                className="w-full bg-[#1677FF] text-white py-2.5 rounded-2xl font-medium text-[14px] flex items-center justify-center gap-1.5"
-              >
-                <LayoutDashboard className="w-4 h-4" />
-                <span>Go to Dashboard</span>
-              </button>
-            </SignedIn>
+            ) : (
+              <>
+                <button
+                  onClick={() => handleNavClick("dashboard")}
+                  className="w-full bg-[#1677FF] text-white py-2.5 rounded-2xl font-medium text-[14px] flex items-center justify-center gap-1.5"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>Go to Dashboard</span>
+                </button>
+                <button
+                  onClick={async () => {
+                    await handleSignOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full bg-red-500 text-white py-2.5 rounded-2xl font-medium text-[14px] flex items-center justify-center gap-1.5 mt-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
     </header>
   );
 }
+
