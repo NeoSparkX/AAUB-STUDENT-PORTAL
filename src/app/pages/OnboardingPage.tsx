@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router";
-import { useSupabaseClient } from "../../lib/supabase";
+import { useAuth } from "../../context/AuthContext";
+import { supabase } from "../../lib/supabase";
 import {
   GraduationCap,
   BookOpen,
@@ -82,18 +82,17 @@ const designations = [
 ];
 
 const inputClassName =
-  "w-full h-[48px] px-4 bg-white/[0.06] border border-white/10 rounded-xl font-['Inter',sans-serif] text-[15px] text-white placeholder:text-[#6b6b80] focus:outline-none focus:ring-2 focus:ring-[#4B68E6]/40 focus:border-[#4B68E6]/50 transition-all";
+  "w-full h-[48px] px-4 bg-gray-100 border border-gray-200 rounded-xl font-['Inter',sans-serif] text-[15px] text-[#101828] placeholder:text-[#475467] focus:outline-none focus:ring-2 focus:ring-[#4B68E6]/40 focus:border-[#4B68E6]/50 transition-all";
 
 const selectClassName =
-  "w-full h-[48px] px-4 bg-white/[0.06] border border-white/10 rounded-xl font-['Inter',sans-serif] text-[15px] text-white focus:outline-none focus:ring-2 focus:ring-[#4B68E6]/40 focus:border-[#4B68E6]/50 transition-all appearance-none cursor-pointer";
+  "w-full h-[48px] px-4 bg-gray-100 border border-gray-200 rounded-xl font-['Inter',sans-serif] text-[15px] text-[#101828] focus:outline-none focus:ring-2 focus:ring-[#4B68E6]/40 focus:border-[#4B68E6]/50 transition-all appearance-none cursor-pointer";
 
 const labelClassName =
-  "block font-['Inter',sans-serif] font-medium text-[13px] text-[#a1a1b5] mb-1.5 uppercase tracking-wide";
+  "block font-['Inter',sans-serif] font-medium text-[13px] text-[#667085] mb-1.5 uppercase tracking-wide";
 
 export function OnboardingPage() {
-  const { user, isLoaded: userLoaded } = useUser();
+  const { user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const supabase = useSupabaseClient();
 
   const [checkingProfile, setCheckingProfile] = useState(true);
   const [step, setStep] = useState<1 | 2>(1);
@@ -103,7 +102,7 @@ export function OnboardingPage() {
 
   // Guard: redirect to dashboard if user already completed onboarding
   useEffect(() => {
-    if (!userLoaded) return;
+    if (authLoading) return;
 
     // Not signed in — redirect to login
     if (!user) {
@@ -122,7 +121,7 @@ export function OnboardingPage() {
     async function checkProfile() {
       try {
         const { data } = await supabase
-          .from("user_profiles")
+          .from("profiles")
           .select("role")
           .eq("id", user!.id)
           .maybeSingle();
@@ -139,7 +138,7 @@ export function OnboardingPage() {
     }
 
     checkProfile();
-  }, [userLoaded, user, supabase, navigate]);
+  }, [authLoading, user, navigate]);
 
   // Student fields
   const [studentId, setStudentId] = useState("");
@@ -197,7 +196,7 @@ export function OnboardingPage() {
 
       // Save to Supabase
       const { error: dbError } = await supabase
-        .from("user_profiles")
+        .from("profiles")
         .upsert(profileRow, { onConflict: "id" });
 
       if (dbError) {
@@ -232,23 +231,25 @@ export function OnboardingPage() {
   };
 
   // Show loading while checking if user already onboarded
-  if (checkingProfile || !userLoaded) {
+  if (checkingProfile || authLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F4F8FC] flex items-center justify-center">
         <Loader2 size={32} className="text-[#4B68E6] animate-spin" />
       </div>
     );
   }
 
+  const firstName = user?.user_metadata?.first_name || "there";
+
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 font-['Inter',sans-serif]">
+    <div className="min-h-screen bg-[#F4F8FC] flex items-center justify-center p-4 font-['Inter',sans-serif]">
       <div className="w-full max-w-[640px]">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-            Welcome, {user?.firstName || "there"}
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#101828] mb-2">
+            Welcome, {firstName}
           </h1>
-          <p className="text-[#6b6b80] text-sm">
+          <p className="text-[#475467] text-sm">
             {step === 1
               ? "Let's set up your account. Who are you?"
               : "Fill in your details to complete setup"}
@@ -257,12 +258,12 @@ export function OnboardingPage() {
           <div className="flex items-center justify-center gap-2 mt-6">
             <div
               className={`h-1 w-12 rounded-full transition-colors ${
-                step >= 1 ? "bg-[#4B68E6]" : "bg-white/10"
+                step >= 1 ? "bg-[#4B68E6]" : "bg-gray-200"
               }`}
             />
             <div
               className={`h-1 w-12 rounded-full transition-colors ${
-                step >= 2 ? "bg-[#4B68E6]" : "bg-white/10"
+                step >= 2 ? "bg-[#4B68E6]" : "bg-gray-200"
               }`}
             />
           </div>
@@ -275,18 +276,18 @@ export function OnboardingPage() {
               <button
                 key={role.id}
                 onClick={() => handleRoleSelect(role.id)}
-                className="bg-[#12121c] border border-white/5 rounded-2xl p-6 text-left hover:border-[#4B68E6]/40 hover:bg-[#4B68E6]/5 transition-all group cursor-pointer"
+                className="bg-white border border-gray-200 rounded-2xl p-6 text-left hover:border-[#4B68E6]/40 hover:bg-[#4B68E6]/5 transition-all group cursor-pointer"
               >
-                <div className="w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center mb-4 group-hover:bg-[#4B68E6]/10 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-4 group-hover:bg-[#4B68E6]/10 transition-colors">
                   <role.icon
                     size={22}
-                    className="text-[#a1a1b5] group-hover:text-[#4B68E6] transition-colors"
+                    className="text-[#667085] group-hover:text-[#4B68E6] transition-colors"
                   />
                 </div>
-                <h3 className="text-white font-semibold text-[16px] mb-1">
+                <h3 className="text-[#101828] font-semibold text-[16px] mb-1">
                   {role.title}
                 </h3>
-                <p className="text-[#6b6b80] text-[13px] leading-relaxed">
+                <p className="text-[#475467] text-[13px] leading-relaxed">
                   {role.description}
                 </p>
               </button>
@@ -296,11 +297,11 @@ export function OnboardingPage() {
 
         {/* Step 2: Role-Specific Form */}
         {step === 2 && selectedRole && (
-          <div className="bg-[#12121c] border border-white/5 rounded-2xl p-6 sm:p-8">
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8">
             {/* Back button */}
             <button
               onClick={handleBack}
-              className="flex items-center gap-2 text-[#6b6b80] hover:text-white text-sm mb-6 transition-colors cursor-pointer"
+              className="flex items-center gap-2 text-[#475467] hover:text-[#101828] text-sm mb-6 transition-colors cursor-pointer"
             >
               <ArrowLeft size={16} />
               Change role
@@ -308,18 +309,18 @@ export function OnboardingPage() {
 
             {/* Role badge */}
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-white/[0.06] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
                 {selectedRole === "student" && (
-                  <GraduationCap size={16} className="text-[#a1a1b5]" />
+                  <GraduationCap size={16} className="text-[#667085]" />
                 )}
                 {selectedRole === "faculty" && (
-                  <BookOpen size={16} className="text-[#a1a1b5]" />
+                  <BookOpen size={16} className="text-[#667085]" />
                 )}
                 {selectedRole === "office" && (
-                  <Building2 size={16} className="text-[#a1a1b5]" />
+                  <Building2 size={16} className="text-[#667085]" />
                 )}
               </div>
-              <span className="text-white font-medium text-sm capitalize">
+              <span className="text-[#101828] font-medium text-sm capitalize">
                 {selectedRole === "faculty"
                   ? "Faculty Member"
                   : selectedRole}{" "}
@@ -360,7 +361,7 @@ export function OnboardingPage() {
                         Select your department
                       </option>
                       {departments.map((d) => (
-                        <option key={d} value={d} className="bg-[#12121c]">
+                        <option key={d} value={d} className="bg-white">
                           {d}
                         </option>
                       ))}
@@ -381,7 +382,7 @@ export function OnboardingPage() {
                         Select your semester
                       </option>
                       {semesters.map((s) => (
-                        <option key={s} value={s} className="bg-[#12121c]">
+                        <option key={s} value={s} className="bg-white">
                           {s}
                         </option>
                       ))}
@@ -408,7 +409,7 @@ export function OnboardingPage() {
                         Select your department
                       </option>
                       {departments.map((d) => (
-                        <option key={d} value={d} className="bg-[#12121c]">
+                        <option key={d} value={d} className="bg-white">
                           {d}
                         </option>
                       ))}
@@ -429,7 +430,7 @@ export function OnboardingPage() {
                         Select your designation
                       </option>
                       {designations.map((d) => (
-                        <option key={d} value={d} className="bg-[#12121c]">
+                        <option key={d} value={d} className="bg-white">
                           {d}
                         </option>
                       ))}
@@ -456,7 +457,7 @@ export function OnboardingPage() {
 
               {/* Error message */}
               {error && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm">
+               <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-600 text-sm">
                   {error}
                 </div>
               )}

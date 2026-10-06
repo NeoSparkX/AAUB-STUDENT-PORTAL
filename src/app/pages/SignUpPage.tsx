@@ -1,17 +1,10 @@
 import { useState } from "react";
-import { useSignUp } from "@clerk/clerk-react";
 import { Link, useNavigate } from "react-router";
 import { Eye, EyeOff, ArrowLeft, Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 import signupBg from "@/assets/signup-bg.png";
 
-const LinkedInIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-  </svg>
-);
-
 export function SignUpPage() {
-  const { isLoaded, signUp } = useSignUp();
   const navigate = useNavigate();
 
   const [firstName, setFirstName] = useState("");
@@ -22,10 +15,10 @@ export function SignUpPage() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoaded) return;
 
     if (!agreeTerms) {
       setError("Please agree to the Privacy Policy and Terms of Service.");
@@ -33,30 +26,33 @@ export function SignUpPage() {
     }
 
     setError("");
+    setSuccessMessage("");
     setLoading(true);
 
     try {
-      await signUp.create({
-        firstName,
-        lastName,
-        username: `${firstName}${lastName}`.toLowerCase().replace(/\s+/g, ""),
-        emailAddress: email,
+      const { data, error } = await supabase.auth.signUp({
+        email,
         password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+          },
+          emailRedirectTo: `${window.location.origin}/dashboard`
+        }
       });
 
-      // Send verification email
-      await signUp.prepareEmailAddressVerification({
-        strategy: "email_code",
-      });
-
-      // Navigate to the verify email page
-      navigate("/verify-email");
+      if (error) throw error;
+      
+      // If auto-confirm is enabled in Supabase, user may be created directly.
+      // Usually, it sends a confirmation email.
+      if (data?.user?.identities?.length === 0) {
+        setError("This email is already registered.");
+      } else {
+        setSuccessMessage("Check your email for the confirmation link!");
+      }
     } catch (err: any) {
-      const message =
-        err?.errors?.[0]?.longMessage ||
-        err?.errors?.[0]?.message ||
-        "An error occurred. Please try again.";
-      setError(message);
+      setError(err.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -86,10 +82,15 @@ export function SignUpPage() {
             </p>
           </div>
 
-          {/* Error */}
+          {/* Messages */}
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm font-['Inter',sans-serif]">
               {error}
+            </div>
+          )}
+          {successMessage && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-600 text-sm font-['Inter',sans-serif]">
+              {successMessage}
             </div>
           )}
 
@@ -204,9 +205,6 @@ export function SignUpPage() {
               </label>
             </div>
 
-            {/* Clerk CAPTCHA */}
-            <div id="clerk-captcha" />
-
             {/* Sign Up Button */}
             <button
               type="submit"
@@ -217,32 +215,6 @@ export function SignUpPage() {
               Sign Up
             </button>
           </form>
-
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-[rgba(0,0,0,0.08)]" />
-            <span className="text-[#a0a0b0] font-['Inter',sans-serif] text-[13px]">
-              or continue with
-            </span>
-            <div className="flex-1 h-px bg-[rgba(0,0,0,0.08)]" />
-          </div>
-
-          {/* LinkedIn Button */}
-          <button
-            type="button"
-            onClick={() => {
-              if (!isLoaded) return;
-              signUp.authenticateWithRedirect({
-                strategy: "oauth_linkedin_oidc",
-                redirectUrl: "/sso-callback",
-                redirectUrlComplete: "/onboarding",
-              });
-            }}
-            className="w-full h-[48px] bg-[#0A66C2] hover:bg-[#004182] text-white font-['Inter',sans-serif] font-semibold text-[15px] rounded-[10px] transition-colors flex items-center justify-center gap-3 cursor-pointer"
-          >
-            <LinkedInIcon />
-            Sign up with LinkedIn
-          </button>
 
           {/* Login Link */}
           <p className="text-center font-['Inter',sans-serif] text-[14px] text-[#717182] mt-6">

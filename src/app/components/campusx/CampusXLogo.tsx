@@ -12,14 +12,14 @@ export function CampusXLogo({ className = "", variant = "default" }: CampusXLogo
       <div className="flex flex-col leading-none">
         <span
           className={`font-['Inter',sans-serif] font-bold text-[19px] tracking-tight ${
-            isLight ? "text-white" : "text-[#0B1633]"
+            isLight ? "text-[#101828]" : "text-[#0B1633]"
           }`}
         >
           Campus<span className="text-[#1677FF]">X</span>
         </span>
         <span
           className={`font-['Inter',sans-serif] font-bold text-[9px] tracking-[0.22em] uppercase mt-0.5 ${
-            isLight ? "text-white/70" : "text-[#1677FF]"
+            isLight ? "text-[#101828]/70" : "text-[#1677FF]"
           }`}
         >
           AAUB

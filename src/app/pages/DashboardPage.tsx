@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import { useUser } from "@clerk/clerk-react";
-import { useSupabaseClient } from "../../lib/supabase";
+import { useAuth } from "../../context/AuthContext";
+import { supabase } from "../../lib/supabase";
 import { StudentDashboard } from "./StudentDashboard";
 import { FacultyDashboard } from "./FacultyDashboard";
 import { OfficeDashboard } from "./OfficeDashboard";
@@ -9,13 +9,16 @@ import { Loader2 } from "lucide-react";
 
 export function DashboardPage() {
   const navigate = useNavigate();
-  const { user, isLoaded: userLoaded } = useUser();
-  const supabase = useSupabaseClient();
+  const { user, isLoading: authLoading } = useAuth();
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!userLoaded || !user) return;
+    if (authLoading) return;
+    if (!user) {
+      navigate("/login", { replace: true });
+      return;
+    }
 
     async function loadProfile() {
       // 1. Check localStorage cache first (fast)
@@ -29,7 +32,7 @@ export function DashboardPage() {
       // 2. No cache — fetch from Supabase
       try {
         const { data, error } = await supabase
-          .from("user_profiles")
+          .from("profiles")
           .select("role")
           .eq("id", user!.id)
           .maybeSingle();
@@ -58,17 +61,17 @@ export function DashboardPage() {
     }
 
     loadProfile();
-  }, [userLoaded, user, supabase, navigate]);
+  }, [authLoading, user, navigate]);
 
-  if (loading || !userLoaded) {
+  if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F4F8FC] flex items-center justify-center">
         <div className="text-center">
           <Loader2
             size={32}
             className="text-[#4B68E6] animate-spin mx-auto mb-3"
           />
-          <p className="text-white/50 font-['Inter',sans-serif] text-sm">
+          <p className="text-[#101828]/50 font-['Inter',sans-serif] text-sm">
             Loading your dashboard...
           </p>
         </div>
